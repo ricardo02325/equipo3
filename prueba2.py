@@ -1,7 +1,20 @@
 import pygame
 import sys
+from logica1 import main  
 
-class Button():
+# Inicializar Pygame
+pygame.init()
+
+# Dimensiones de la pantalla principal
+WIDTH, HEIGHT = 1280, 720
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Niveles")
+main_font = pygame.font.SysFont("cambria", 35)
+background = pygame.image.load("fondo.png").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+# Clase para representar un botón
+class Button:
     def __init__(self, image, x_pos, y_pos, text_input):
         self.image = image
         self.x_pos = x_pos
@@ -18,32 +31,17 @@ class Button():
         screen.blit(self.image, self.rect)
         screen.blit(self.text, self.text_rect)
 
-    def checkForInput(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            print("Button pressed")
-
-    def changeColor(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            self.text = main_font.render(self.text_input, True, "green")
-        else:
-            self.text = main_font.render(self.text_input, True, "white")
-
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((1080, 720))
-    pygame.display.set_caption("Levels")
-    main_font = pygame.font.SysFont("cambria", 50)
-    background = pygame.image.load("fondo.png").convert()
-
+    def check_for_input(self, position):
+        return self.rect.collidepoint(position)
+def iniciar_juego():
+    # Cargar imágenes y escalarlas para los botones
     boton = pygame.image.load("botonrojo.png")
-    botonPress = pygame.image.load("BotonRojoPress.jpg")
-    tamanoboton = pygame.transform.scale(boton, (200, 100))
+    tamanoboton = pygame.transform.scale(boton, (150, 200))
 
-    button1 = Button(tamanoboton, 200, 200, "Nivel 1")
-    button2 = Button(tamanoboton, 540, 200, "Nivel 2")
-    button3 = Button(tamanoboton, 880, 200, "Nivel 3")
-    botonDifFacil = Button(tamanoboton, 400, 500, "Facil")
-    botonDifDificil = Button(tamanoboton, 600, 500, "Dificil")
+    # Crear los botones
+    button1 = Button(tamanoboton, 250, 200, "Nivel 1")
+    button2 = Button(tamanoboton, 650, 200, "Nivel 2")
+    button3 = Button(tamanoboton, 1030, 200, "Nivel 3")
 
     while True:
         for event in pygame.event.get():
@@ -51,23 +49,19 @@ def main():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                button1.checkForInput(pygame.mouse.get_pos())
-                button2.checkForInput(pygame.mouse.get_pos())
-                button3.checkForInput(pygame.mouse.get_pos())
-                botonDifFacil.checkForInput(pygame.mouse.get_pos())
-                botonDifDificil.checkForInput(pygame.mouse.get_pos())
+                if button1.check_for_input(pygame.mouse.get_pos()):
+                    main()
+
+        # Actualizar la pantalla principal
         screen.blit(background, [0, 0])
-
         button1.update()
-        button1.changeColor(pygame.mouse.get_pos())
         button2.update()
-        button2.changeColor(pygame.mouse.get_pos())
         button3.update()
-        button3.changeColor(pygame.mouse.get_pos())
-        botonDifFacil.update()
-        botonDifFacil.changeColor(pygame.mouse.get_pos())
-
         pygame.display.update()
-
+        
 if __name__ == "__main__":
-    main()
+    # Inicializar Pygame
+    pygame.init()
+
+    # Llamar a la función para iniciar el juego
+    iniciar_juego()

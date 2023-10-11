@@ -18,6 +18,10 @@ color_negro = (0, 0, 0)
 # Variable para poder poner el tiempo en reversa
 auxiliar = 0
 
+# Contador y objetivo
+objetivo_contador = 5
+cantidad_actual = 0
+
 # Establecer el reloj principal
 relojPrincipal = pygame.time.Clock()
 
@@ -31,36 +35,14 @@ fuente = pygame.font.SysFont(None, 20)
 nivel1 = pygame.image.load("nivel1.png").convert()
 nivel1 = pygame.transform.scale(nivel1, (ancho, alto))
 
-# Recursos para jugador
-jugador_derecha = pygame.image.load("personaje1.png")
-jugador_derecha.set_colorkey(color_blanco)
-jugador_derecha = pygame.transform.scale(jugador_derecha, (200, 140))
-
-jugador_izquierda = pygame.image.load("personaje2.png")
-jugador_izquierda.set_colorkey(color_blanco)
-jugador_izquierda = pygame.transform.scale(jugador_izquierda, (200, 140))
-
-jugador = jugador_derecha  # Inicialmente, el jugador mira hacia la derecha
-
-# Recursos para objeto
-objeto1 = pygame.image.load("pescao.png")
-objeto1.set_colorkey(color_blanco)
-objeto1 = pygame.transform.scale(objeto1, (90, 140))
-
-# Posición inicial del objeto
-objeto_x = random.uniform(0, ancho - 200)
-objeto_y = 0
-
-# Cosas para la fuente
-fuente = pygame.font.SysFont("Arial", 30)
+# ... (código existente)
 
 def juego(tiempo_inicial):
-    corriendo = True
-    global auxiliar, jugador_x, jugador  # Permitimos modificar la variable global auxiliar y jugador
+    global auxiliar, jugador_x, jugador, cantidad_actual  # Permitimos modificar la variable global auxiliar, jugador y cantidad_actual
     jugador_x = ancho // 2 - 100  # Posición inicial del jugador en x
     tiempo_max = 120  # Tiempo máximo en segundos
 
-    while corriendo:
+    while True:
         tiempo_juego = (pygame.time.get_ticks() - tiempo_inicial) // 1000
         tiempo = tiempo_max - tiempo_juego
 
@@ -74,28 +56,30 @@ def juego(tiempo_inicial):
                 pygame.quit()
                 sys.exit()
 
-        # Obtener las teclas presionadas
         teclas = pygame.key.get_pressed()
 
-        # Mover al jugador
         if teclas[pygame.K_LEFT] and jugador_x > 0:
             jugador_x -= 5
-            jugador = jugador_izquierda  # Cambiar al personaje que camina hacia la izquierda
+            jugador = jugador_izquierda
         elif teclas[pygame.K_RIGHT] and jugador_x < ancho - 200:
             jugador_x += 5
-            jugador = jugador_derecha  # Cambiar al personaje que camina hacia la derecha
+            jugador = jugador_derecha
 
-        # Pon el tiempo en pantalla
-        contador = fuente.render("Tiempo: " + str(tiempo), 0, (0,0,0))
+        # Verificar colisión con el objeto
+        if jugador_x < objeto_x + 90 and jugador_x + 200 > objeto_x and 570 < objeto_y + 140:
+            cantidad_actual += 1
+            objeto_x = random.uniform(0, ancho - 200)
+            objeto_y = 0
+
+        contador = fuente.render("Tiempo: " + str(tiempo), 0, color_negro)
         ventana.blit(contador, (10, 10))
 
-        # Dibujar jugador
-        ventana.blit(jugador, (jugador_x, 570))
+        contador_objetivo = fuente.render("Contador: " + str(cantidad_actual) + "/" + str(objetivo_contador), 0, color_negro)
+        ventana.blit(contador_objetivo, (10, 50))
 
-        # Dibujar objeto
+        ventana.blit(jugador, (jugador_x, 570))
         ventana.blit(objeto1, (objeto_x, objeto_y))
 
-        # Actualizar la ventana
         pygame.display.update()
         relojPrincipal.tick(60)
 
